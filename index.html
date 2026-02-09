@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>RCCG Wonderland Zone – Text to Speech</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 
 <style>
 :root{
@@ -16,8 +16,7 @@ body{
   background: linear-gradient(135deg, #4e1818, #001a4d);
   margin:0;
   padding:10px;
-  min-height: 100vh;
-  -webkit-text-size-adjust: 100%;
+  min-height:100vh;
 }
 
 .app{
@@ -36,26 +35,38 @@ header{
 header h1{
   margin:10px 0;
   color:var(--blue);
-  font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
-header p{
-  color:#555;
-  font-size:14px;
-}
-
+/* Mobile-friendly textarea updates */
 textarea{
   width:100%;
-  height: clamp(150px, 40vh, 300px);
+  height:220px;
   padding:12px;
   border-radius:10px;
   border:1px solid #ccc;
   font-size:16px;
-  box-sizing: border-box;
-  resize: vertical;
-  min-height: 150px;
-  max-height: 400px;
-  -webkit-appearance: none;
+  resize:vertical;
+  /* Mobile optimizations */
+  box-sizing: border-box; /* Include padding in width calculation */
+  -webkit-appearance: none; /* Remove iOS styling */
+  touch-action: manipulation; /* Improve touch responsiveness */
+}
+
+/* Improve textarea on small screens */
+@media (max-width: 480px) {
+  textarea {
+    height:180px; /* Slightly smaller height on very small screens */
+    font-size: 17px; /* Slightly larger font for better readability */
+    line-height: 1.4; /* Better line spacing for mobile */
+    padding: 14px; /* More touch-friendly padding */
+  }
+}
+
+/* Prevent zoom on iOS when focusing textarea */
+@media (max-width: 768px) {
+  textarea {
+    font-size: 16px; /* Maintain readable font size */
+  }
 }
 
 .controls{
@@ -65,43 +76,55 @@ textarea{
   margin:15px 0;
 }
 
-select, button{
+button{
   padding:12px;
   border-radius:8px;
   font-size:15px;
-  width:100%;
-}
-
-button{
   background:var(--blue);
   color:#fff;
   border:none;
   cursor:pointer;
-  touch-action: manipulation;
-  min-height: 44px;
 }
 
 button.secondary{
   background:#777;
 }
 
-.meter-container{
-  margin:15px 0;
+select{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:10px;
+  font-size:15px;
+}
+
+.range-group{
+  margin:12px 0;
+}
+
+.range-group label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  color:#333;
+}
+
+input[type="range"]{
+  width:100%;
 }
 
 .meter{
-  height:20px;
+  height:18px;
   background:#eee;
   border-radius:20px;
   overflow:hidden;
-  margin-top:5px;
 }
 
 .meter span{
   display:block;
   height:100%;
   width:0%;
-  background:linear-gradient(90deg, var(--accent), var(--blue));
+  background:linear-gradient(90deg,var(--accent),var(--blue));
   transition:width .1s linear;
 }
 
@@ -110,71 +133,14 @@ footer{
   font-size:12px;
   color:#777;
   margin-top:15px;
-  padding-top:10px;
-  border-top:1px solid #eee;
-}
-
-/* Mobile-specific adjustments */
-@media (max-width: 480px) {
-  body{
-    padding:5px;
-  }
-  
-  .app{
-    padding:12px;
-    border-radius:12px;
-  }
-  
-  .controls{
-    grid-template-columns: 1fr;
-    gap:6px;
-  }
-  
-  select, button{
-    padding:14px 12px;
-    font-size:16px;
-  }
-  
-  textarea{
-    font-size:17px; /* Better for mobile typing */
-    padding:15px;
-  }
-  
-  header img{
-    width:140px;
-    height:auto;
-  }
-}
-
-/* Tablet adjustments */
-@media (min-width: 481px) and (max-width: 768px) {
-  .controls{
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  textarea{
-    height: 200px;
-  }
-}
-
-/* Prevent zoom on iOS input focus */
-@media (max-width: 768px) {
-  textarea {
-    font-size: 16px;
-  }
-  
-  select {
-    font-size: 16px;
-  }
 }
 </style>
 </head>
 
 <body>
-<!--Developed by Sidmoses Technology for RCCG Wonderland Zonal Headquarters, Abule-Egba, Lagos. 08033187992-->
 <div class="app">
 <header>
-  <img src="rccg-logo.png" width="180" alt="RCCG Logo" style="max-width:100%; height:auto;">
+  <img src="rccg-logo.png" width="170" alt="RCCG Logo">
   <h1>RCCG Wonderland Zone LP10</h1>
   <p>Text-to-Speech Reader</p>
 </header>
@@ -189,9 +155,24 @@ footer{
 
 <select id="voiceSelect"></select>
 
-<div class="meter-container">
-  <label>Voice Frequency Meter</label>
-  <div class="meter"><span id="meterBar"></span></div>
+<div class="range-group">
+  <label>
+    <span>Reading Speed</span>
+    <strong id="rateVal">1.0×</strong>
+  </label>
+  <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+</div>
+
+<div class="range-group">
+  <label>
+    <span>Voice Depth / Tone</span>
+    <strong id="pitchVal">1.0</strong>
+  </label>
+  <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+</div>
+
+<div class="meter">
+  <span id="meterBar"></span>
 </div>
 
 <footer>
@@ -201,64 +182,38 @@ footer{
 
 <script>
 let voices = [];
-let utterance = null;
+let utterance;
 let isPaused = false;
 let meterActive = false;
-let nigeriaEnglishVoice = null;
 
-/* Voice selection */
+/* Load voices (local first) */
 function loadVoices(){
   voices = speechSynthesis.getVoices();
   voiceSelect.innerHTML = "";
-  
-  // Look for Nigeria English voice first
-  nigeriaEnglishVoice = voices.find(v => 
-    v.lang.toLowerCase().includes('en-ng') || 
-    v.name.toLowerCase().includes('nigeria') ||
-    v.name.toLowerCase().includes('africa')
-  );
-  
-  voices.forEach((v,i)=>{
-    let o=document.createElement("option");
-    o.value=i;
-    o.textContent=`${v.name} (${v.lang})`;
-    voiceSelect.appendChild(o);
-  });
 
-  // Auto-select Nigeria English if available, otherwise best English voice
-  if(nigeriaEnglishVoice){
-    const nigeriaIndex = voices.indexOf(nigeriaEnglishVoice);
-    voiceSelect.value = nigeriaIndex;
-  } else {
-    const preferred = voices.findIndex(v =>
-      v.name.toLowerCase().includes("google") && v.lang.startsWith("en")
-    );
-    voiceSelect.value = preferred !== -1 ? preferred : 0;
-  }
+  voices
+    .sort(v => v.localService ? -1 : 1)
+    .forEach((v,i)=>{
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${v.name} (${v.lang})${v.localService ? " • Offline" : ""}`;
+      voiceSelect.appendChild(opt);
+    });
 }
 
-// Load voices when they become available
-if(speechSynthesis.onvoiceschanged !== undefined){
-  speechSynthesis.onvoiceschanged = loadVoices;
-}
-
-// Try loading voices immediately
+speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
 /* PLAY */
 function playSpeech(){
-  stopSpeech(); // clean start
-
+  stopSpeech();
   const text = document.getElementById("text").value.trim();
   if(!text) return;
 
   utterance = new SpeechSynthesisUtterance(text);
-  
-  // Use selected voice
-  const selectedVoiceIndex = parseInt(voiceSelect.value);
-  if(selectedVoiceIndex >= 0 && selectedVoiceIndex < voices.length){
-    utterance.voice = voices[selectedVoiceIndex];
-  }
+  utterance.voice = voices[voiceSelect.value];
+  utterance.rate = rate.value;
+  utterance.pitch = pitch.value;
 
   utterance.onstart = () => {
     meterActive = true;
@@ -266,11 +221,10 @@ function playSpeech(){
   };
 
   utterance.onend = stopSpeech;
-
   speechSynthesis.speak(utterance);
 }
 
-/* PULSE (Pause / Resume) */
+/* PAUSE / RESUME */
 function pulseSpeech(){
   if(!speechSynthesis.speaking) return;
 
@@ -294,10 +248,10 @@ function stopSpeech(){
   updateMeter(0);
 }
 
-/* Meter simulation */
+/* Meter animation */
 function animateMeter(){
   if(!meterActive) return;
-  updateMeter(30 + Math.random() * 60);
+  updateMeter(35 + Math.random() * 60);
   setTimeout(animateMeter, 120);
 }
 
@@ -305,11 +259,10 @@ function updateMeter(val){
   meterBar.style.width = val + "%";
 }
 
-// Prevent accidental form submission on mobile
-document.addEventListener('touchstart', function(){}, {passive: true});
+/* Live labels */
+rate.oninput = () => rateVal.textContent = rate.value + "×";
+pitch.oninput = () => pitchVal.textContent = pitch.value;
 </script>
 
 </body>
-
 </html>
-
